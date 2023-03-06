@@ -43,3 +43,8 @@ adata.uns['iroot'] = np.flatnonzero(adata.obs['leiden']  == '5')[8]
 sc.tl.dpt(adata)
 sc.pl.draw_graph(adata,color='dpt_pseudotime')
 sc.pl.umap(adata,color='dpt_pseudotime')
+
+plt.rcParams['figure.figsize']=(10,4)
+sc.pl.paga_path(adata3,adata3.obs.groupby('V2').mean().sort_values('dpt_pseudotime').index,reg_corp, groups_key='V2',
+               color_map='seismic',color_maps_annotations={'dpt_pseudotime': 'viridis'},n_avg=100,show_node_names=True,
+               ytick_fontsize=8)
