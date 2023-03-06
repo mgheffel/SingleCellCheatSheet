@@ -32,3 +32,14 @@ sc.tl.paga(adata2, groups='leiden')
 sc.pl.paga(adata2,color=['lp25'],threshold=0)
 sc.tl.draw_graph(adata2, init_pos='paga')
 sc.pl.draw_graph(adata2,color=['lp25'])
+
+for i in range(20):
+    print(i)
+    adata.uns['iroot'] = np.flatnonzero(adata.obs['leiden']  == '5')[i]
+    sc.tl.dpt(adata)
+    sc.pl.umap(adata,color='dpt_pseudotime',vmax=.5)
+
+adata.uns['iroot'] = np.flatnonzero(adata.obs['leiden']  == '5')[8]
+sc.tl.dpt(adata)
+sc.pl.draw_graph(adata,color='dpt_pseudotime')
+sc.pl.umap(adata,color='dpt_pseudotime')
