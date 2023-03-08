@@ -1,0 +1,35 @@
+#expects 2d dataframe of fractions
+from matplotlib.collections import PatchCollection
+def dotplot_df(df):
+    df=df[::-1]
+    xlabels=df.columns
+    ylabels=df.head(40).index
+
+    N = len(ylabels)
+    M = len(xlabels)
+
+
+    x, y = np.meshgrid(np.arange(M), np.arange(N))
+    dfmax=df.max().max()
+    df=np.clip(df,dfmax*-1,dfmax)
+    s = df.head(40).to_numpy()
+    c = df.head(40).to_numpy()
+
+    fig, ax = plt.subplots()
+    s=s*-1
+    s=s-s.min()
+    R = s/s.max()/2.5
+    circles = [plt.Circle((j,i), radius=r) for r, j, i in zip(R.flat, x.flat, y.flat)]
+    col = PatchCollection(circles, array=c.flatten(), cmap="Reds_r")
+    ax.add_collection(col)
+
+    ax.set(xticks=np.arange(M), yticks=np.arange(N),
+           xticklabels=xlabels, yticklabels=ylabels)
+    ax.set_xticks(np.arange(M+1)-0.5, minor=True)
+    ax.set_yticks(np.arange(N+1)-0.5, minor=True)
+    ax.grid(which='minor')
+    plt.xticks(rotation = 90)
+    fig.colorbar(col)
+    plt.show()
+    return col
+# dotplot_df(df.head(40))
