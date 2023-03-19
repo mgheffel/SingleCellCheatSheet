@@ -6,48 +6,7 @@ adata.obs['nL2']=np.where(adata.obs['temp_clust'].isnull(),adata.obs['nL2'],adat
 sc.external.pp.harmony_integrate(adata2, 'batch',max_iter_harmony=20)
 sc.pp.neighbors(adata2,n_pcs=20,n_neighbors=20,use_rep='X_pca_harmony')
 
-#DPT Pseudotime
 
-def get_differential_genes(ad,groupby='L3',num_genes=20):
-    sc.tl.rank_genes_groups(ad,groupby=groupby)
-    hv=[]
-    for i in range(num_genes):
-        for i in ad.uns['rank_genes_groups']['names'][i]:
-            if i not in hv: hv.append(i)
-        if len(hv)>=num_genes: break
-                
-    return list(set(hv))
-def get_pseudotime_corr_vars(ad,n_genes=10,negative=False):
-    xdf=ad.to_df()
-    xdf['dpt']=ad.obs['dpt_pseudotime']
-    corrs_list=[]
-    for c in xdf.columns[:-1]:
-        corrs_list.append(xdf[c].corr(xdf['dpt']))
-    cdf=pd.DataFrame(corrs_list,index=xdf.columns[:-1])
-    cdf=cdf.rename(columns={0:'corr'})
-    if negative:
-        return list(cdf.sort_values('corr').head(n_genes).index)
-    else:
-        return list(cdf.sort_values('corr',ascending=False).head(n_genes).index)
 
       
-sc.tl.paga(adata2, groups='leiden')
-sc.pl.paga(adata2,color=['lp25'],threshold=0)
-sc.tl.draw_graph(adata2, init_pos='paga')
-sc.pl.draw_graph(adata2,color=['lp25'])
 
-for i in range(20):
-    print(i)
-    adata.uns['iroot'] = np.flatnonzero(adata.obs['leiden']  == '5')[i]
-    sc.tl.dpt(adata)
-    sc.pl.umap(adata,color='dpt_pseudotime',vmax=.5)
-
-adata.uns['iroot'] = np.flatnonzero(adata.obs['leiden']  == '5')[8]
-sc.tl.dpt(adata)
-sc.pl.draw_graph(adata,color='dpt_pseudotime')
-sc.pl.umap(adata,color='dpt_pseudotime')
-
-plt.rcParams['figure.figsize']=(10,4)
-sc.pl.paga_path(adata3,adata3.obs.groupby('V2').mean().sort_values('dpt_pseudotime').index,reg_corp, groups_key='V2',
-               color_map='seismic',color_maps_annotations={'dpt_pseudotime': 'viridis'},n_avg=100,show_node_names=True,
-               ytick_fontsize=8)
