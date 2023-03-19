@@ -40,7 +40,10 @@ sc.tl.dpt(adata)
 sc.pl.draw_graph(adata,color='dpt_pseudotime')
 sc.pl.umap(adata,color='dpt_pseudotime')
 
-
+#invert paths for bidirectional paga plotting
+invert_types = ['RG-2', 'OPC', 'ODC', 'Astro']
+adata.obs['inverted_dpt'] = adata.obs['dpt_pseudotime'].copy()
+adata.obs.loc[adata.obs['L3'].isin(invert_types), 'inverted_dpt'] =  adata.obs['dpt_pseudotime']*-1
 
                
                
