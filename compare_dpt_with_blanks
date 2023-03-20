@@ -1,0 +1,134 @@
+http://localhost:7832/notebooks/project-cluo/downHoffman/MGE/OO_make_pseudotime_pagapath_inGraphScale-ERBB4_ALL----NEW-Copy1.ipynb
+
+
+plt.rcParams['figure.figsize'] = [10, 20]
+def plot_reg_diff2(adata,genes,save=False,dotplot=False):
+    
+    ctx_ad=adata[adata.obs['L5']=='CTX_2T_Inh-eMGE'][:,genes]
+    ov=ctx_ad.var.index
+    nv=[]
+    for v in ov:
+        nv.append('ctx_'+v)
+    ctx_ad.var=ctx_ad.var.rename(index={ov[i]:nv[i] for i in range(len(ov))})
+    ctx_ad.obs=ctx_ad.obs.rename(index={ctx_ad.obs.index[i]:str(i) for i in range(len(ctx_ad.obs.index))})
+    hpc_ad=adata[adata.obs['L5']=='HPC_2T_Inh-eMGE'][:,genes]
+    ov=hpc_ad.var.index
+    nv=[]
+    for v in ov:
+        nv.append('hpc_'+v)
+    hpc_ad.var=hpc_ad.var.rename(index={ov[i]:nv[i] for i in range(len(ov))})
+    hpc_ad.obs=hpc_ad.obs.rename(index={hpc_ad.obs.index[i]:str(i) for i in range(len(hpc_ad.obs.index))})
+    cat_ad=ctx_ad.copy().transpose().concatenate(hpc_ad.copy().transpose()).transpose()
+    ov=cat_ad.var.index
+    nv=[]
+    for v in ov:
+        nv.append(v[:-2])
+    cat_ad.var=cat_ad.var.rename(index={ov[i]:nv[i] for i in range(len(ov))})
+    #for ag in ['3T_','i_','a_']:
+#     return cat_ad
+    for l5 in ['CTX_3T_Inh-eMGE','CTX_3T_Inh-MGE','CTX_infant_Inh-MGE-ERBB4','CTX_adult_Inh-MGE-ERBB4']:
+        ctx_ad=adata[adata.obs['L5']==l5][:,genes]
+        ov=ctx_ad.var.index
+        nv=[]
+        for v in ov:
+            nv.append('ctx_'+v)
+        ctx_ad.var=ctx_ad.var.rename(index={ov[i]:nv[i] for i in range(len(ov))})
+        ctx_ad.obs=ctx_ad.obs.rename(index={ctx_ad.obs.index[i]:str(i) for i in range(len(ctx_ad.obs.index))})
+        hpc_ad=adata[adata.obs['L5']=='HPC'+l5[3:]][:,genes]
+        ov=hpc_ad.var.index
+        nv=[]
+        for v in ov:
+            nv.append('hpc_'+v)
+        hpc_ad.var=hpc_ad.var.rename(index={ov[i]:nv[i] for i in range(len(ov))})
+        hpc_ad.obs=hpc_ad.obs.rename(index={hpc_ad.obs.index[i]:str(i) for i in range(len(hpc_ad.obs.index))})
+        cat_ad2=ctx_ad.copy().transpose().concatenate(hpc_ad.copy().transpose()).transpose()
+        ov=cat_ad2.var.index
+        nv=[]
+        for v in ov:
+            nv.append(v[:-2])
+        cat_ad2.var=cat_ad2.var.rename(index={ov[i]:nv[i] for i in range(len(ov))})
+#         return cat_ad,hpc_ad
+        cat_ad=cat_ad.concatenate(cat_ad2)
+    #return ctx_ad,hpc_ad, cat_ad
+    blank=pd.DataFrame(cat_ad.X[:,0])
+    blank[0]=0
+    blank=AnnData(blank,cat_ad.obs,pd.DataFrame(['blank']).set_index(0))
+    cat_ad=cat_ad.copy().transpose().concatenate(blank.transpose()).transpose()
+    ov=cat_ad.var.index
+    nv=[]
+    for v in ov:
+        nv.append(v[:-2])
+    cat_ad.var=cat_ad.var.rename(index={ov[i]:nv[i] for i in range(len(ov))})
+    
+#     adata2.uns['L5_colors']=['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f']
+    order=['2T_eMGE','3T_eMGE','3T_MGE','iERBB4','aERBB4']
+    g_list=[]
+    for g in genes:
+        g_list.append('ctx_'+g)
+        g_list.append('hpc_'+g)
+        g_list.append('blank')
+    cat_ad.obs['dpt_pseudotime']=cat_ad.obs['dpt_pseudotime-1']
+    cat_ad.obs['L4a']=cat_ad.obs['L4a'].astype('category')
+#     print(cat_ad.obs['L6'].unique())
+    #return ctx_ad,hpc_ad, cat_ad
+    sc.pl.paga_path(cat_ad,order,g_list, groups_key='L4a',
+                   color_map='seismic',color_maps_annotations={'dpt_pseudotime': 'viridis'},n_avg=100,
+        normalize_to_zero_one=True,show_node_names=True,ytick_fontsize=8,save=save)
+    if dotplot:
+        sc.pl.stacked_violin(adata[adata.obs['L5'].isin(['CTX_3T_Inh-MGE','HPC_3T_Inh-MGE'])], genes, groupby='L5',cmap='seismic',swap_axes=True,
+                            colorbar_title='median mCG')
+#         sc.pl.stacked_violin(adata2[adata2.obs['L5'].isin(['2T_CA','2T_UL'])], genes, groupby='L5',cmap='seismic',swap_axes=True,
+#                             colorbar_title='median mCG')
+#         sc.pl.stacked_violin(adata2[adata2.obs['L5'].isin(['i_CA','i_UL'])], genes, groupby='L5',cmap='seismic',swap_axes=True,
+#                             colorbar_title='median mCG')
+        #Scale this by 0-1 norm instead
+        #sc.pp.scale(cat_ad)
+#         cpad=adata.copy()
+#         print(cpad.X)
+#         x_mat=cpad.X.transpose()
+#         print(pd.DataFrame(((x_mat.transpose()-x_mat.min(axis=1))/ (x_mat.max(axis=1).transpose()-x_mat.min(axis=1).transpose())).transpose()).fillna(.5).to_numpy())
+#         cpad.X=pd.DataFrame(((x_mat.transpose()-x_mat.min(axis=1))/ (x_mat.max(axis=1).transpose()-x_mat.min(axis=1).transpose())).transpose()).fillna(.5).transpose().to_numpy()
+#         print(cpad.X)
+#         sc.pl.stacked_violin(cpad[cpad.obs['L5'].isin(['CTX_3T_Inh-MGE','HPC_3T_Inh-MGE'])], genes, groupby='L5',cmap='seismic',swap_axes=True,
+#                             colorbar_title='median mCG')
+        if save!=False:
+            save='dot_'+save
+        sc.pl.stacked_violin(adata[adata.obs['L5'].isin(['CTX_3T_Inh-MGE','HPC_3T_Inh-MGE'])], genes, groupby='L5',cmap='seismic',swap_axes=True,
+                             colorbar_title='median mCG',standard_scale='var',save=save)
+        if save!=False:
+            save='dot_full_'+save
+        sc.pl.stacked_violin(adata,genes,categories_order=['CTX_2T_Inh-eMGE','HPC_2T_Inh-eMGE','CTX_3T_Inh-eMGE','HPC_3T_Inh-eMGE','CTX_3T_Inh-MGE','HPC_3T_Inh-MGE',
+                                                        'CTX_infant_Inh-MGE-ERBB4','HPC_infant_Inh-MGE-ERBB4','CTX_adult_Inh-MGE-ERBB4','HPC_adult_Inh-MGE-ERBB4'],
+                              groupby='L5',cmap='seismic',swap_axes=True,
+                             colorbar_title='median mCG',standard_scale='var',save=save)
+    return cat_ad
+
+
+
+
+
+plt.rcParams['figure.figsize'] = [10, 20]
+gain_CG=['TSHZ2_CG','RBFOX1_CG',
+         'SORCS2_CG','SGCD_CG','PRDM16_CG',
+         'LINC02694_CG', 'CDH4_CG','DENND1A_CG','SLIT3_CG',
+         'LRMDA_CG',    'GSE1_CG',  'FHIT_CG',
+          'MACROD1_CG','EYS_CG','CACNA1I_CG','PRKN_CG','MSI2_CG', 'RBFOX3_CG',
+          'LINC00598_CG','ST18_CG',
+         'LINGO2_CG',
+         'MIR646HG_CG','DRAIC_CG','MIR3681HG_CG','LINC00595_CG']
+ad=plot_reg_diff2(adata2,gain_CG,dotplot=True,save='normed_MGE_gainCG.svg')
+
+plt.rcParams['figure.figsize']=(6,4)
+lose_CG=[ 'NXPH1_CG','MEF2C_CG', 'MEF2C-AS2_CG','GRIN2B_CG','PRICKLE2_CG','NTRK2_CG',
+         'ARNT2_CG','LGMN_CG','YWHAG_CG',
+         'KCNC2_CG', 'ELAVL2_CG', 
+           'GAD2_CG','GABRB2_CG', 
+         'ATP1B1_CG',
+          'AFAP1_CG',
+         'HDAC5_CG',  'SPTAN1_CG', 'DUSP10_CG', 
+          
+          'USP22_CG',   
+         'KCNC1_CG','NCS1_CG',  'SNHG14_CG', 'MIR29B2CHG_CG','SIRPA_CG']
+print(dual_plot(adata2,lose_CG,order,False,50,150,cmap='seismic',show_names=True,save='lose_CG.png'))
+plt.rcParams['figure.figsize'] = [10, 20]
+ad=plot_reg_diff2(adata2,lose_CG,dotplot=True,save='normed_MGE_loseCG.svg')
