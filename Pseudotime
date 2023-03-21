@@ -67,4 +67,47 @@ sc.pl.paga_path(adata3,adata3.obs.groupby('V2').mean().sort_values('dpt_pseudoti
       
 
                ytick_fontsize=8)
-               
+
+###
+#different size heatmap rows
+#https://stackoverflow.com/questions/48459801/matplotlib-seaborn-control-line-row-height-of-heatmap
+import numpy as np;np.random.seed(1)
+import matplotlib.pyplot as plt
+
+# get some data
+a = np.random.rayleigh(3,111)
+h,_ = np.histogram(a)
+data = np.r_[[h]*10].T+np.random.rand(10,10)*11
+
+# produce scaling for data
+y = np.cumsum(np.append([0],np.sum(data, axis=1)))
+x = np.arange(data.shape[1]+1)
+X,Y = np.meshgrid(x,y)
+# plot heatmap
+im = plt.pcolormesh(X,Y,data)
+
+# set ticks
+ticks = y[:-1] + np.diff(y)/2
+plt.yticks(ticks, np.arange(len(ticks)))
+plt.xticks(np.arange(data.shape[1])+0.5,np.arange(data.shape[1]))
+# colorbar
+plt.colorbar(im)
+
+plt.show()
+###
+
+
+###
+###different colored heatmap rows
+#https://stackoverflow.com/questions/68837536/how-to-use-a-different-colormap-for-different-rows-of-a-heatmap
+# Reds
+data1 = data.copy()
+data1.loc[7] = float('nan')
+ax = sns.heatmap(data1, annot=True, cmap="Reds")
+
+# Greens
+data2 = data.copy()
+data2.loc[:6] = float('nan')
+sns.heatmap(data2, annot=True, cmap="Greens")
+
+###
