@@ -33,3 +33,38 @@ def dotplot_df(df):
     plt.show()
     return col
 # dotplot_df(df.head(40))
+
+
+#cell type donor ratio / number of cells 
+ag='2T'
+reg='HPC'
+
+df2T=df[df['age_groups']==ag]
+df2T=df2T[df2T['region']==reg]
+df2T=df2T[~df2T['Sample'].isin(['20210316_UMB4267','20210316_UA1822'])]
+df2T=pd.crosstab(df2T['L3'],df2T['Sample'])
+sums=df2T.transpose().sum()
+df2T['sum']=sums
+df2T=df2T[df2T['sum']>=10]
+sums=df2T.transpose().sum()
+df2T=df2T[df2T.columns[:-1]]
+df2T=df2T.transpose()
+for c in df2T.columns:
+    df2T[c]=df2T[c]/sums[c]
+df2T=df2T.transpose()
+plt.rcParams['figure.figsize']=(2,len(df2T)/4)
+ax=df2T.plot(kind='barh',stacked=True,width=.9,color=sc.pl.palettes.vega_10[:len(df2T.columns)])
+for c in ax.containers:
+    labels = [str((v.get_width()*100).round(1))+'%' if v.get_width() > 0 else '' for v in c]
+ax.legend(loc='center left',bbox_to_anchor=(1,.5))
+plt.savefig(ag+'_'+reg+'_celltype_sample_comp.svg', bbox_inches='tight')
+plt.show()
+
+sdf=pd.DataFrame(sums)
+sdf=np.log10(sdf)
+ax=sdf.plot(kind='barh',width=.9,color=sc.pl.palettes.vega_10[:len(df2T)])
+ax.set_xlabel('log10 cell count')
+ax.axvline(x=2, linestyle='--', color='gray')
+ax.legend(loc='center left',bbox_to_anchor=(1,.5))
+plt.savefig(ag+'_'+reg+'_celltype_count.svg', bbox_inches='tight')
+plt.show()
