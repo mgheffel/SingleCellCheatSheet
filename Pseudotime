@@ -111,3 +111,74 @@ data2.loc[:6] = float('nan')
 sns.heatmap(data2, annot=True, cmap="Greens")
 
 ###
+
+
+###
+custom pseudotime path genes chunk ct plot
+df=pdata.to_df()
+df['pseudotime']=pdata.obs['dpt_pseudotime']
+df['inverted_dpt']=pdata.obs['inverted_dpt']
+df['dptL3']=pdata.obs['pdpt']
+df=pd.DataFrame(df.groupby('dptL3').mean())
+df=df.transpose()
+
+
+order=pdata.obs.groupby('pdpt').mean().sort_values('inverted_dpt').index
+order
+order=['ODC_0', 'ODC_1', 'OPC_0', 'OPC_1', 'Astro_0', 'Astro_1', 'Astro_2',
+       'Astro_3', 'RGCs_G_0', 'RG-2_0', 'RGCs_0', 'RGCs_N_0', 'HBA2_0',
+       'INPs_0', 'CA_0',  'CA_1', 'CA_2', 'CA_3', 'CA_4',
+        'GC_0','GC_1','GC_2', 'GC_3']
+df=df
+df=df[order]
+order
+
+import seaborn as sns
+plt.rcParams['figure.figsize']=(5,2)
+pdf=df
+
+pdf=pdf.transpose()
+# pdf['pseudotime']=pdata.obs['inverted_dpt']
+pdf=pdf[['CRYAB','MBP','FBXO32','DOCK10','SOX10',
+         'CSPG4','PCDH15','OLIG1','OLIG2','PDGFRA',
+         'DGKG','ALDH1A1',
+         'FAM107A','HOPX',
+         'COL5A3','ATP13A4','LRIG1','TNC','NES','PTN',
+         
+         'PAX6','SOX2','VIM','LUZP2','SPON1','EGFR',
+         'GLI3','HES1','SFRP1','LIPG','FABP7','HBA2','SATB2',
+         'SOX4','NEUROD2','SYT4',
+         'EOMES','SOX11','TBR1',
+         
+         
+         
+         'NRG1',
+         'MYT1L','GALNT18',
+        'CSMD1',
+        'RBFOX1','NELL2',
+         
+         'RYR3','DOCK9','CHRM3','KIAA0319','MEIS2',
+        'SSTR2',
+         'PROX1','TLL1','SEMA5A','CFAP43','pseudotime']]##cell
+for col in pdf.columns:
+    if 'dpt' in col or 'pseudotime' in col:
+        continue
+    normalize_col_zero_one(pdf,col)
+# plt.rcParams['figure.figsize']=(8,12)
+plt.rcParams['figure.figsize']=(6,6)
+pdf=pdf.transpose()
+pdf['b1']=np.nan
+pdf['b2']=np.nan
+pdf['b3']=np.nan
+pdf['b4']=np.nan
+pdf=pdf[['ODC_0', 'ODC_1', 'OPC_0', 'OPC_1','b1' ,'Astro_0', 'Astro_1', 'Astro_2',
+       'Astro_3', 'RGCs_G_0', 'b3','RG-2_0', 'RGCs_0','RGCs_N_0',
+         'b4',  'HBA2_0',
+       'INPs_0', 'CA_0',  'CA_1', 'CA_2', 'CA_3', 'CA_4','b2',
+        'GC_0','GC_1','GC_2', 'GC_3']]
+pdf=pdf.transpose()
+sns.set(font_scale=0.5)
+sns.heatmap(pdf.transpose(), annot=False,cmap='viridis')
+plt.savefig('genes_dpt.svg')
+plt.show()
+###
