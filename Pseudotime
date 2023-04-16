@@ -33,6 +33,16 @@ for i in range(20):
     adata.uns['iroot'] = np.flatnonzero(adata.obs['leiden']  == '5')[i]
     sc.tl.dpt(adata)
     sc.pl.umap(adata,color='dpt_pseudotime',vmax=.5)
+    
+#view root cells
+for i in range(1,300):
+    print(i)
+    cell=adata[adata.obs['l53']=='RG-1_15'][i].obs.index[0]
+    adata.obs['this_cell']=np.nan
+    adata.obs.loc[cell,'this_cell']='1'
+    adata.obs['dotsize']=1
+    adata.obs.loc[cell,'dotsize']='20'
+    sc.pl.umap(adata, color=['this_cell'],size=adata.obs['dotsize'])
 
 #set root node and run pseudotime
 adata.uns['iroot'] = np.flatnonzero(adata.obs['leiden']  == '5')[8]
