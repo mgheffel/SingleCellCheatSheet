@@ -4,6 +4,8 @@ adata.obs['nL2']=np.where(adata.obs['temp_clust'].isnull(),adata.obs['nL2'],adat
 
 #Add obsm to obs
 adata.obs[['umap_0','umap_1']]=adata.obsm['X_umap']
+#set obsm X_umap from obs
+adata.obsm['X_umap']=adata.obs[['umap_0','umap_1']].to_numpy()
 
 #harmony integration
 sc.external.pp.harmony_integrate(adata, 'batch',max_iter_harmony=20)
