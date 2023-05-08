@@ -1,3 +1,9 @@
+import matplotlib
+import matplotlib.pyplot as plt
+matplotlib.rcParams['pdf.fonttype']=42
+plt.rcParams['font.family']='Verdana'
+
+
 #expects 2d dataframe of fractions
 from matplotlib.collections import PatchCollection
 def dotplot_df(df):
