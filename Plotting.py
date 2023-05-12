@@ -6,8 +6,7 @@ plt.rcParams['font.family']='Verdana'
 
 #expects 2d dataframe of fractions
 from matplotlib.collections import PatchCollection
-def dotplot_df(df):
-    df=df[::-1]
+def dotplot_df(df,cmap='Reds'):
     xlabels=df.columns
     ylabels=df.head(40).index
 
@@ -26,7 +25,7 @@ def dotplot_df(df):
     s=s-s.min()
     R = s/s.max()/2.5
     circles = [plt.Circle((j,i), radius=r) for r, j, i in zip(R.flat, x.flat, y.flat)]
-    col = PatchCollection(circles, array=c.flatten(), cmap="Reds_r")
+    col = PatchCollection(circles, array=c.flatten(), cmap=cmap)
     ax.add_collection(col)
 
     ax.set(xticks=np.arange(M), yticks=np.arange(N),
