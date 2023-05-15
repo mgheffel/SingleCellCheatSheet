@@ -11,6 +11,10 @@ adata.obs['3C_X_umap_0']=adata2.obs['X_umap_0']
 adata.obs['3C_X_umap_1']=adata2.obs['X_umap_1']
 load_obsm_from_obs(adata,'3C_X_umap','X_umap')
 
+#invert umap along diagonal axis (swap X,Y)
+adata.obs['mC_X_draw_graph_faF_0']=adata.obs['mC_X_draw_graph_fa_1']
+adata.obs['mC_X_draw_graph_faF_1']=adata.obs['mC_X_draw_graph_fa_0']
+
 #harmony integration
 sc.external.pp.harmony_integrate(adata, 'batch',max_iter_harmony=20)
 sc.pp.neighbors(adata,n_pcs=20,n_neighbors=20,use_rep='X_pca_harmony')
