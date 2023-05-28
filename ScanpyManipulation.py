@@ -1,6 +1,6 @@
 #obs rewrite based on other columns 
-adata.obs['temp_clust']=adata2.obs['leiden2'].apply(lambda i: clust_map[i] if i in clust_map else np.nan)
-adata.obs['nL2']=np.where(adata.obs['temp_clust'].isnull(),adata.obs['nL2'],adata.obs['temp_clust'])
+adata.obs['temp_clust']=adata.obs['leiden'].apply(lambda i: clust_map[i] if i in clust_map else np.nan)
+adata.obs['col_name']=np.where(adata.obs['temp_clust'].isnull(),adata.obs['col_name'],adata.obs['temp_clust'])
 
 def load_obsm_to_obs(ad,key):
     ad.obs[[key+'_0',key+'_1']]=ad.obsm[key]
