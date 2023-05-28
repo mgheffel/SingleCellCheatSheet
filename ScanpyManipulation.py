@@ -19,6 +19,12 @@ adata.obs['mC_X_draw_graph_faF_1']=adata.obs['mC_X_draw_graph_fa_0']
 sc.external.pp.harmony_integrate(adata, 'batch',max_iter_harmony=20)
 sc.pp.neighbors(adata,n_pcs=20,n_neighbors=20,use_rep='X_pca_harmony')
 
+#remove 100kb bin variables
+gvar=[]
+for g in adata.var.index:
+    try: int(g.split('_')[0])
+    except: gvar.append(g)
+
 
 
       
