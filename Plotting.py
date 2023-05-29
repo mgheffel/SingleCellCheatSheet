@@ -1,5 +1,7 @@
 import matplotlib
 import matplotlib.pyplot as plt
+import scanpy as sc
+sc.set_figure_params(figsize=(4,4))
 matplotlib.rcParams['pdf.fonttype']=42
 plt.rcParams['font.family']='Verdana'
 
