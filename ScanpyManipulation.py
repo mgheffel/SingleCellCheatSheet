@@ -1,3 +1,6 @@
+#print all column options to rewrite
+for i in sorted(adata.obs['leiden'].unique()):
+    print("clust_map['"+i+"']='"+i+"'")
 #obs rewrite based on other columns 
 adata.obs['temp_clust']=adata.obs['leiden'].apply(lambda i: clust_map[i] if i in clust_map else np.nan)
 adata.obs['col_name']=np.where(adata.obs['temp_clust'].isnull(),adata.obs['col_name'],adata.obs['temp_clust'])
