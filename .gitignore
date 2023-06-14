@@ -1,7 +1,8 @@
 # ignore ALL .log files
 *.log
 
-# ignore ALL files in ANY directory named DATA
+# ignore ALL files in ANY directory named DATA or __pycache__
 DATA/
+__pycache__/
 
 .ipynb_checkpoints/
