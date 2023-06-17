@@ -198,19 +198,8 @@ plt.show()
 
 adata2=adata.copy()
 keep=[]
-keep=keep+list(adata2[adata2.obs['2T_L3']=='RG-1'].obs.sample(250,random_state=0).index)
-keep=keep+list(adata2[adata2.obs['2T_L3']=='RG-2'].obs.sample(250,random_state=0).index)
-keep=keep+list(adata2[adata2.obs['2T_L3']=='RG-CA'].obs.sample(250,random_state=0).index)
-keep=keep+list(adata2[adata2.obs['2T_L3']=='RG-UL'].obs.sample(250,random_state=0).index)
-keep=keep+list(adata2[adata2.obs['2T_L3']=='RG-DG'].obs.sample(250,random_state=0).index)
-keep=keep+list(adata2[adata2.obs['2T_L3']=='Exc-UL'].obs.sample(250,random_state=0).index)
-keep=keep+list(adata2[adata2.obs['2T_L3']=='Exc-CA-1'].obs.sample(250,random_state=0).index)
-keep=keep+list(adata2[adata2.obs['2T_L3']=='Exc-CA-3'].obs.sample(250,random_state=0).index)
-keep=keep+list(adata2[adata2.obs['2T_L3']=='Exc-DL'].obs.sample(250,random_state=0).index)
-keep=keep+list(adata2[adata2.obs['2T_L3']=='Exc-DL-2'].obs.sample(250,random_state=0).index)
-keep=keep+list(adata2[adata2.obs['2T_L3']=='Exc-ENT'].obs.sample(250,random_state=0).index)
-keep=keep+list(adata2[adata2.obs['2T_L3']=='RG-DG'].obs.sample(250,random_state=0).index)
-keep=keep+list(adata2[adata2.obs['2T_L3']=='Oligo'].obs.sample(250,random_state=0).index)
-
+for ct in adata2.obs['sL3'].unique():
+    keep=keep+list(adata2[adata2.obs['sL3']==ct].obs.sample(222,random_state=0).index)
 print(adata2.shape)
-adata2=adata2[adata2.obs.index.isin(keep)]
+data2=adata2[adata2.obs.index.isin(keep)]
+print(adata2.shape)
