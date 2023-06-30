@@ -5,6 +5,9 @@ for i in sorted(adata.obs['leiden'].unique()):
 adata.obs['temp_clust']=adata.obs['leiden'].apply(lambda i: clust_map[i] if i in clust_map else np.nan)
 adata.obs['col_name']=np.where(adata.obs['temp_clust'].isnull(),adata.obs['col_name'],adata.obs['temp_clust'])
 
+for i in sorted(adata2.obs['panno'].unique()):
+    print("adata2.obs['panno']=adata2.obs['panno'].replace('"+i+"','')")
+
 def load_obsm_to_obs(ad,key):
     ad.obs[[key+'_0',key+'_1']]=ad.obsm[key]
 def load_obsm_from_obs(ad,key,obsm_key='X_umap'):
