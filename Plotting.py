@@ -5,6 +5,18 @@ sc.set_figure_params(figsize=(4,4))
 matplotlib.rcParams['pdf.fonttype']=42
 plt.rcParams['font.family']='Verdana'
 
+#UMAP / draw_graph / scatter plot coordinate manipulation framework
+adata.obsm['X_draw_graph_fa_mC']=adata.obsm['X_draw_graph_fa'][:, [1, 0]]
+adata.obsm['X_pca_3C']=adata2.obsm['X_pca']
+array=adata2.obsm['X_draw_graph_fa'][:, [1, 0]].copy()
+array[:, 0] = -array[:, 0]
+adata.obsm['X_draw_graph_fa_3C'] = array
+array=adata2.obsm['X_umap'][:, [1, 0]].copy()
+array[:, 0] = -array[:, 0]
+adata.obsm['X_umap_3C']=array
+#[:, [1, 0]]*-1
+adata.obs['3C_dpt']=adata2.obs['dpt_pseudotime']
+
 
 #expects 2d dataframe of fractions
 from matplotlib.collections import PatchCollection
