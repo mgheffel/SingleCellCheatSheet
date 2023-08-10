@@ -9,7 +9,7 @@ plt.rcParams['font.family']='Verdana'
 #rotate umap -180 degrees (left)
 adata.obsm['X_draw_graph_fa_mC']=adata.obsm['X_draw_graph_fa'][:, [1, 0]]
 #flip x-axis
-array=adata2.obsm['X_draw_graph_fa_3C'][:, [1, 0]].copy()
+array=adata2.obsm['X_draw_graph_fa_3C'] # [:, [1, 0]].copy()
 array[:, 0] = -array[:, 0]
 adata.obsm['X_draw_graph_fa_3C'] = array
 
