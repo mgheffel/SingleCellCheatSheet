@@ -31,7 +31,21 @@ for g in adata.var.index:
     try: int(g.split('_')[0])
     except: gvar.append(g)
 
-
+#downsample adata to all unique values of obs_col having same number of cells
+def downsample(ad,obs_col,min_cluster_size=10):
+    cdf=pd.DataFrame(ad.obs[obs_col].value_counts())
+    cdf=cdf[cdf[cdf.columns[0]]>=min_cluster_size]
+    ad2=ad[ad.obs[cdf.columns[0]].isin(cdf.index)].copy()
+    keep_count=ad2.obs[obs_col].value_counts().min()
+    print(keep_count)
+    keep=[]
+    for ct in ad2.obs[obs_col].unique():
+        keep=keep+list(ad[ad.obs[obs_col]==ct].obs.sample(keep_count,random_state=0).index)
+    ad2=ad[ad.obs.index.isin(keep)]
+    ad2.obs[obs_col]=ad2.obs[obs_col].astype(str)
+    ad2.obs[obs_col]=ad2.obs[obs_col].astype('category')
+    ad2.var.index=[str(c) for c in ad2.var.index]
+    return ad2
 
       
 
