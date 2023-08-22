@@ -73,53 +73,62 @@ for path in paths:
       
 plt.rcParams['figure.figsize']=(10,4)
 sc.pl.paga_path(adata3,adata3.obs.groupby('V2').mean().sort_values('dpt_pseudotime').index,reg_corp, groups_key='V2',
-               color_map='seismic',color_maps_annotations={'dpt_pseudotime': 'viridis'},n_avg=100,show_node_names=True,
-      
-
-               ytick_fontsize=8)
+               color_map='seismic',color_maps_annotations={'dpt_pseudotime': 'viridis'},n_avg=100,show_node_names=True,ytick_fontsize=8)
 
 ###
-#different size heatmap rows
-#https://stackoverflow.com/questions/48459801/matplotlib-seaborn-control-line-row-height-of-heatmap
-import numpy as np;np.random.seed(1)
-import matplotlib.pyplot as plt
-
-# get some data
-a = np.random.rayleigh(3,111)
-h,_ = np.histogram(a)
-data = np.r_[[h]*10].T+np.random.rand(10,10)*11
-
-# produce scaling for data
-y = np.cumsum(np.append([0],np.sum(data, axis=1)))
-x = np.arange(data.shape[1]+1)
-X,Y = np.meshgrid(x,y)
-# plot heatmap
-im = plt.pcolormesh(X,Y,data)
-
-# set ticks
-ticks = y[:-1] + np.diff(y)/2
-plt.yticks(ticks, np.arange(len(ticks)))
-plt.xticks(np.arange(data.shape[1])+0.5,np.arange(data.shape[1]))
-# colorbar
-plt.colorbar(im)
-
-plt.show()
-###
-
-
-###
-###different colored heatmap rows
-#https://stackoverflow.com/questions/68837536/how-to-use-a-different-colormap-for-different-rows-of-a-heatmap
-# Reds
-data1 = data.copy()
-data1.loc[7] = float('nan')
-ax = sns.heatmap(data1, annot=True, cmap="Reds")
-
-# Greens
-data2 = data.copy()
-data2.loc[:6] = float('nan')
-sns.heatmap(data2, annot=True, cmap="Greens")
-
+#multimodal compare paga plots
+#create multimod adata for plotting
+jdata=adata3.copy().transpose().concatenate(gsdf.copy().transpose()).transpose()
+jdata=jdata[jdata.obs.index.isin(adata3.obs.index)]
+jdata.var.index=[i[:-2] for i in jdata.var.index]
+#optional check gene lengths
+# df=pd.read_csv('../DATA/gencode.v33.gene.bed',sep='\t',header=None).set_index(3)
+# df['len']=df[2]-df[1]
+# df=df[~df.index.duplicated()]
+# gsv=gsdf.var
+# gsv=gsv[~gsv.index.duplicated()]
+# gsv=gsv[gsv.index.isin(df.index)]
+# gsv['len']=df['len']
+# gsv=gsv.sort_values('len',ascending=False)
+#plotting function
+def plot_multimod(jdata,genes,order,obs_key,no_CH=False):
+    rdf=[]
+    jdf=jdata.to_df()
+    jdf['b1']=.5
+    count=0
+    jgenes=[]
+    for g in genes:
+        if g in jdata.var.index and g+'_CG' in jdata.var.index :
+            if no_CH or g+'_CH'in jdata.var.index:
+                if gsv.loc[g][0]<100000:
+                    try:
+                        rdf.append((g,gsv.loc[g][0],'drop : len < 100,000'))
+                    except:
+                        rdf.append((g,np.nan,'drop : len < 100,000'))
+                    print(g,' -drop : len < 100,000')
+                    continue
+            rdf.append((g,gsv.loc[g][0],''))
+            jgenes.append(g)
+            jgenes.append(g+'_CG')
+            if not no_CH:
+                jgenes.append(g+'_CH')
+            jdf['b'+str(count)]=.5
+            jgenes.append('b'+str(count))
+            count+=1
+        else:
+            print(g,'else')
+            try:
+                rdf.append((g,gsv.loc[g][0],'drop : not in all mods'))
+            except:
+                rdf.append((g,np.nan,'drop : not in all mods'))
+    jdata2=AnnData(jdf,obs=jdata.obs)
+    print(jgenes)
+    sc.pl.paga_path(jdata2,order,jgenes, groups_key=obs_key,
+               color_map='seismic',color_maps_annotations={'dpt_pseudotime': 'viridis'},n_avg=100,
+    normalize_to_zero_one=True,show_node_names=True,ytick_fontsize=6)
+    return pd.DataFrame(rdf,columns=['gene','len','drop']).set_index('gene')
+#call
+plot_multimod(jdata,all_mod_genes,order=pathA,obs_key='panno',no_CH=True)
 ###
 
 
