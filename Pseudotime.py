@@ -182,7 +182,7 @@ def plot_compare_anndata(adata,genes, batch_key,smooth=150,save=False):
     for g in genes:
         for batch in adata.obs[batch_key].unique():
 #             print(g,batch)
-            g_list.append('human_'+g)
+            g_list.append(batch+'_'+g)
             #fix this
             g_list.append(batch+'_'+g)
         g_list.append('blank')
@@ -208,13 +208,17 @@ def plot_compare_anndata(adata,genes, batch_key,smooth=150,save=False):
                 ytick_fontsize=8)
 #########
 ###RUN
-cpadata=build_compare_path_andata(adata3,batch_key)
-# batch_adatas=populate_compare_anndata(adata3,batch_key,path_key,path,cpadata,use_genes)
+cpadata=build_compare_path_andata(adata3,'region')
+batch_key='region'
+path_key='panno'
+path=pathA
+# use_genes=[g[:-3] for g in posA_mC]
+use_genes=posA_mC
 cpadata=populate_compare_anndata(adata3,batch_key,path_key,path,cpadata,use_genes)
 cpadata.obs['dpt_pseudotime']=cpadata.obs['dpt_pseudotime-1']
 cpadata.obs[path_key]=cpadata.obs[path_key].astype('category')
-cpadata.obs['species']=cpadata.obs['species-1']
-plot_compare_anndata(cpadata,use_genes,batch_key,save='mm-hg_RG.svg')
+cpadata.obs['region']=cpadata.obs['region-1']
+plot_compare_anndata(cpadata,use_genes,'region',save=False)
 ###
 
 ###
