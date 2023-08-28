@@ -131,6 +131,83 @@ def plot_multimod(jdata,genes,order,obs_key,no_CH=False):
 plot_multimod(jdata,all_mod_genes,order=pathA,obs_key='panno',no_CH=True)
 ###
 
+###
+#compare 2 analagous groups of cells in pseudotime
+###
+def build_compare_path_andata(adata,batch):
+    batch_adatas=[]
+    for b in adata.obs[batch].unique():
+        if str(b)=='nan': continue
+        bdata=adata[adata.obs[batch]==b]
+        ov=bdata.var.index
+        nv=[]
+        for v in ov:
+            nv.append(b+'_'+v)
+        bdata.var=bdata.var.rename(index={ov[i]:nv[i] for i in range(len(ov))})
+        batch_adatas.append(bdata)
+    cat_ad=batch_adatas[0].transpose()
+    cat_ad=cat_ad.concatenate([b.transpose() for b in batch_adatas[1:]]).transpose()
+    ov=cat_ad.var.index
+    nv=[]
+    for v in ov:
+        nv.append(v[:-2])
+    cat_ad.var=cat_ad.var.rename(index={ov[i]:nv[i] for i in range(len(ov))})
+    return cat_ad
+#
+def populate_compare_anndata(andata,batch_col,path_col,path,cdata, genes):
+    batch_adatas={}
+    for b in andata.obs[batch_col].unique():
+        batch_adatas[b]=[]
+        for ct in path:
+            
+            bdata=andata[andata.obs[batch_col]==b][:,genes]
+            bdata=bdata[bdata.obs[path_col]==ct]
+            sorted_index=bdata.obs.sort_values(by='dpt_pseudotime').index
+            bdata=bdata[sorted_index]
+            ov=bdata.var.index
+            nv=[b+'_'+v for v in ov]
+            bdata.var=bdata.var.rename(index={ov[i]:nv[i] for i in range(len(ov))})
+            bdata.obs=bdata.obs.rename(index={bdata.obs.index[i]:str(i) for i in range(len(bdata.obs.index))})
+            batch_adatas[b].append(bdata)
+        batch_adatas[b]=batch_adatas[b][0].copy().concatenate([bad.copy() for bad in batch_adatas[b][1:]])
+    bad_keys=list(batch_adatas.keys())
+    cat_ad=batch_adatas[bad_keys[0]].copy().transpose().concatenate([batch_adatas[k].copy().transpose() for k in bad_keys[1:]]).transpose()
+    ov=cat_ad.var.index
+    nv=[v[:-2] for v in ov]
+    cat_ad.var=cat_ad.var.rename(index={ov[i]:nv[i] for i in range(len(ov))})
+    return cat_ad
+#
+def plot_compare_anndata(adata,genes, batch_key,smooth=150,save=False):
+    g_list=[]
+    for g in genes:
+        for batch in adata.obs[batch_key].unique():
+#             print(g,batch)
+            g_list.append('human_'+g)
+            #fix this
+            g_list.append(batch+'_'+g)
+        g_list.append('blank')
+#     print(g_list)
+    blank=pd.DataFrame(adata.X[:,0])
+    blank[0]=0
+    blank=AnnData(blank,adata.obs,pd.DataFrame(['blank']).set_index(0))
+    adata=adata.copy().transpose().concatenate(blank.transpose()).transpose()
+    ov=adata.var.index
+    nv=[]
+    for v in ov:
+        nv.append(v[:-2])
+    adata.var=adata.var.rename(index={ov[i]:nv[i] for i in range(len(ov))})
+    if save:
+        sc.pl.paga_path(adata,path,g_list, groups_key='panno',
+               color_map='seismic',color_maps_annotations={'dpt_pseudotime': 'turbo'},n_avg=smooth,show_node_names=True,
+                normalize_to_zero_one=True,
+                ytick_fontsize=8,save=save)
+    else:
+        sc.pl.paga_path(adata,path,g_list, groups_key='panno',
+               color_map='seismic',color_maps_annotations={'dpt_pseudotime': 'turbo'},n_avg=smooth,show_node_names=True,
+                normalize_to_zero_one=True,
+                ytick_fontsize=8)
+#########
+###
 
 ###
 custom pseudotime path genes chunk ct plot
