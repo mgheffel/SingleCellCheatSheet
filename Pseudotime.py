@@ -177,16 +177,12 @@ def populate_compare_anndata(andata,batch_col,path_col,path,cdata, genes):
     cat_ad.var=cat_ad.var.rename(index={ov[i]:nv[i] for i in range(len(ov))})
     return cat_ad
 #
-def plot_compare_anndata(adata,genes, batch_key,smooth=150,save=False):
+def plot_compare_anndata(adata,genes, compare_vars=[],smooth=150,save=False):
     g_list=[]
     for g in genes:
-        for batch in adata.obs[batch_key].unique():
-#             print(g,batch)
-            g_list.append(batch+'_'+g)
-            #fix this
+        for batch in compare_vars:
             g_list.append(batch+'_'+g)
         g_list.append('blank')
-#     print(g_list)
     blank=pd.DataFrame(adata.X[:,0])
     blank[0]=0
     blank=AnnData(blank,adata.obs,pd.DataFrame(['blank']).set_index(0))
@@ -208,6 +204,7 @@ def plot_compare_anndata(adata,genes, batch_key,smooth=150,save=False):
                 ytick_fontsize=8)
 #########
 ###RUN
+plt.rcParams['figure.figsize']=(4,10)
 cpadata=build_compare_path_andata(adata3,'region')
 batch_key='region'
 path_key='panno'
@@ -218,7 +215,7 @@ cpadata=populate_compare_anndata(adata3,batch_key,path_key,path,cpadata,use_gene
 cpadata.obs['dpt_pseudotime']=cpadata.obs['dpt_pseudotime-1']
 cpadata.obs[path_key]=cpadata.obs[path_key].astype('category')
 cpadata.obs['region']=cpadata.obs['region-1']
-plot_compare_anndata(cpadata,use_genes,'region',save=False)
+plot_compare_anndata(cpadata,use_genes,compare_vars=['CTX','HPC'],save=False)
 ###
 
 ###
