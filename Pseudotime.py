@@ -207,6 +207,14 @@ def plot_compare_anndata(adata,genes, batch_key,smooth=150,save=False):
                 normalize_to_zero_one=True,
                 ytick_fontsize=8)
 #########
+###RUN
+cpadata=build_compare_path_andata(adata3,batch_key)
+# batch_adatas=populate_compare_anndata(adata3,batch_key,path_key,path,cpadata,use_genes)
+cpadata=populate_compare_anndata(adata3,batch_key,path_key,path,cpadata,use_genes)
+cpadata.obs['dpt_pseudotime']=cpadata.obs['dpt_pseudotime-1']
+cpadata.obs[path_key]=cpadata.obs[path_key].astype('category')
+cpadata.obs['species']=cpadata.obs['species-1']
+plot_compare_anndata(cpadata,use_genes,batch_key,save='mm-hg_RG.svg')
 ###
 
 ###
