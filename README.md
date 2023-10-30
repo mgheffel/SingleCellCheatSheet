@@ -1,7 +1,7 @@
 # SingleCellCheatSheet
 
 This is a collection of code, continually updated, I often find myself reusing in single cell analyses. 
-Currently this is not well organized and
+Maybe someday I will organize this better for more public use
 
 #TODO
 #add example notebooks that import function scripts
