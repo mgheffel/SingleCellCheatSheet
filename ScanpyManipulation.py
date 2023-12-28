@@ -8,6 +8,18 @@ adata.obs['col_name']=np.where(adata.obs['temp_clust'].isnull(),adata.obs['col_n
 for i in sorted(adata2.obs['panno'].unique()):
     print("adata2.obs['panno']=adata2.obs['panno'].replace('"+i+"','')")
 
+#normalize features by global methylation levels
+def normalize_dataframe_zero_one(df):
+    min_values = df.min()
+    max_values = df.max()
+    df = (df - min_values) / (max_values - min_values)
+    return df
+adata.obs['mCG']=adata.obs['mCG/CG']-adata.obs['mCCC/CCC']
+mcgdf=mcgdf.sub(adata[:,[g for g in adata.var.index if '_CG' in g]].obs['mCG'],axis=0)
+mcgdf = normalize_dataframe_zero_one(mcgdf)
+from scanpy import AnnData
+adata=AnnData(mcgdf,obs=adata.obs,var=adata.var)
+
 def load_obsm_to_obs(ad,key):
     ad.obs[[key+'_0',key+'_1']]=ad.obsm[key]
 def load_obsm_from_obs(ad,key,obsm_key='X_umap'):
