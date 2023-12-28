@@ -5,6 +5,13 @@ def normalize_col_zero_one(df,col):
     df[col] = df[col] - min_value
     df[col] = df[col] / (max_value - min_value)
     
+#effeciency function to normalize an entire dataframe
+def normalize_dataframe_zero_one(df):
+    min_values = df.min()
+    max_values = df.max()
+    df = (df - min_values) / (max_values - min_values)
+    return df
+    
     
 chunks_dict={}
 chunks_dict['CA']=5
