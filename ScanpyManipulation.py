@@ -2,6 +2,7 @@ conv_table=pd.read_csv('ensg_to_symbol.tsv',sep='\t').set_index('ENSG').to_dict(
 adata.var.index=adata.var.index.map(lambda x: conv_table.get(x, x))
 
 #print all column options to rewrite
+clust_map={}
 for i in sorted(adata.obs['leiden'].unique()):
     print("clust_map['"+i+"']='"+i+"'")
 #obs rewrite based on other columns 
